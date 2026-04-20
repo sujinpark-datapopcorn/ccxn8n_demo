@@ -1,0 +1,297 @@
+{
+  "name": "NASA Weekly Space Weather Dashboard",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000001",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "astronomyPictureOfTheDay",
+        "operation": "get",
+        "download": false,
+        "additionalFields": {}
+      },
+      "id": "1a000000-0000-0000-0000-000000000002",
+      "name": "NASA - APOD",
+      "type": "n8n-nodes-base.nasa",
+      "typeVersion": 1,
+      "position": [
+        480,
+        100
+      ],
+      "credentials": {
+        "nasaApi": {
+          "id": "",
+          "name": "NASA account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "asteroidNeoFeed",
+        "operation": "get",
+        "additionalFields": {
+          "startDate": "={{ $now.toFormat('yyyy-MM-dd') }}",
+          "endDate": "={{ $now.toFormat('yyyy-MM-dd') }}"
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000003",
+      "name": "NASA - Asteroid Neo Feed",
+      "type": "n8n-nodes-base.nasa",
+      "typeVersion": 1,
+      "position": [
+        480,
+        300
+      ],
+      "credentials": {
+        "nasaApi": {
+          "id": "",
+          "name": "NASA account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "donkiSolarFlare",
+        "operation": "get",
+        "additionalFields": {
+          "startDate": "={{ $now.minus({ days: 7 }).toFormat('yyyy-MM-dd') }}",
+          "endDate": "={{ $now.toFormat('yyyy-MM-dd') }}"
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000004",
+      "name": "NASA - DONKI Solar Flare",
+      "type": "n8n-nodes-base.nasa",
+      "typeVersion": 1,
+      "position": [
+        480,
+        500
+      ],
+      "credentials": {
+        "nasaApi": {
+          "id": "",
+          "name": "NASA account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 3
+      },
+      "id": "1a000000-0000-0000-0000-000000000005",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const items = $input.all();\nconst apod = items[0]?.json || {};\nconst neoFeed = items[1]?.json || {};\nconst flareRaw = items[2]?.json || {};\nconst flareList = Array.isArray(flareRaw) ? flareRaw : (Array.isArray(flareRaw.data) ? flareRaw.data : []);\n\nconst today = new Date().toISOString().split('T')[0];\n\nconst neoData = neoFeed.near_earth_objects || {};\nconst asteroidsByDate = Object.entries(neoData).map(([date, asteroids]) => ({\n  date,\n  count: asteroids.length,\n  hazardous: asteroids.filter(a => a.is_potentially_hazardous_asteroid).length\n}));\n\nconst flareClassCounts = {};\nflareList.forEach(f => {\n  const cls = (f.classType || 'Unknown').charAt(0);\n  flareClassCounts[cls] = (flareClassCounts[cls] || 0) + 1;\n});\n\nconst totalAsteroids = asteroidsByDate.reduce((s, d) => s + d.count, 0);\nconst hazardous = asteroidsByDate.reduce((s, d) => s + d.hazardous, 0);\nconst flareCount = flareList.length;\n\nconst neoDates = JSON.stringify(asteroidsByDate.map(d => d.date));\nconst neoCounts = JSON.stringify(asteroidsByDate.map(d => d.count));\nconst neoHazard = JSON.stringify(asteroidsByDate.map(d => d.hazardous));\nconst flarePie = JSON.stringify(\n  Object.entries(flareClassCounts).map(([k, v]) => ({ name: k + '급', value: v }))\n);\n\nconst esc = (s) => String(s ?? '').replace(/[&<>\"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[c]));\n\nconst html = `<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>NASA 우주 날씨 대시보드 - ${today}</title>\n<script src=\"https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js\"></script>\n<style>\n  *{box-sizing:border-box}\n  body{background:#0b0e14;color:#e6e6e6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:24px;line-height:1.5}\n  h1{color:#7dd3fc;margin:0 0 4px}\n  h2{color:#a5b4fc;margin-top:0;font-size:1.1rem}\n  h3{margin:8px 0;color:#fafafa}\n  .meta{color:#94a3b8;margin-bottom:24px;font-size:.9rem}\n  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}\n  .card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px}\n  .full{grid-column:1/-1}\n  .chart{width:100%;height:320px}\n  img{max-width:100%;border-radius:8px;display:block;margin:8px 0}\n  .stat{display:inline-block;margin-right:24px}\n  .stat .num{font-size:1.6rem;font-weight:bold;color:#38bdf8}\n  .stat .lbl{font-size:.85rem;color:#94a3b8;margin-left:4px}\n</style>\n</head>\n<body>\n<h1>🚀 NASA 우주 날씨 주간 대시보드</h1>\n<div class=\"meta\">업데이트: ${today} · Asia/Seoul</div>\n<div class=\"card full\" style=\"margin-bottom:16px\">\n  <span class=\"stat\"><span class=\"num\">${totalAsteroids}</span><span class=\"lbl\">근접 소행성</span></span>\n  <span class=\"stat\"><span class=\"num\">${hazardous}</span><span class=\"lbl\">잠재 위험</span></span>\n  <span class=\"stat\"><span class=\"num\">${flareCount}</span><span class=\"lbl\">7일 플레어</span></span>\n</div>\n<div class=\"grid\">\n  <div class=\"card full\">\n    <h2>오늘의 천문사진 (APOD)</h2>\n    <h3>${esc(apod.title)}</h3>\n    ${apod.media_type === 'image' && apod.url ? `<img src=\"${esc(apod.url)}\" alt=\"${esc(apod.title)}\">` : ''}\n    <p>${esc((apod.explanation || '').slice(0, 600))}${(apod.explanation || '').length > 600 ? '…' : ''}</p>\n  </div>\n  <div class=\"card\">\n    <h2>지구 근접 소행성 (오늘)</h2>\n    <div id=\"neo\" class=\"chart\"></div>\n  </div>\n  <div class=\"card\">\n    <h2>태양 플레어 클래스 분포 (지난 7일)</h2>\n    <div id=\"flare\" class=\"chart\"></div>\n  </div>\n</div>\n<script>\nconst common = { backgroundColor:'transparent', textStyle:{color:'#e6e6e6'} };\nconst neoChart = echarts.init(document.getElementById('neo'),'dark');\nneoChart.setOption({\n  ...common,\n  tooltip:{trigger:'axis'},\n  legend:{textStyle:{color:'#e6e6e6'}},\n  grid:{left:40,right:20,top:40,bottom:30},\n  xAxis:{type:'category',data:${neoDates},axisLabel:{color:'#94a3b8'}},\n  yAxis:{type:'value',axisLabel:{color:'#94a3b8'}},\n  series:[\n    {name:'전체',type:'bar',data:${neoCounts},itemStyle:{color:'#38bdf8'}},\n    {name:'잠재 위험',type:'bar',data:${neoHazard},itemStyle:{color:'#f43f5e'}}\n  ]\n});\nconst flareChart = echarts.init(document.getElementById('flare'),'dark');\nflareChart.setOption({\n  ...common,\n  tooltip:{trigger:'item'},\n  legend:{bottom:0,textStyle:{color:'#e6e6e6'}},\n  series:[{\n    name:'클래스',type:'pie',radius:['40%','65%'],\n    data:${flarePie},\n    label:{color:'#e6e6e6'},\n    itemStyle:{borderColor:'#0b0e14',borderWidth:2}\n  }]\n});\nwindow.addEventListener('resize',()=>{neoChart.resize();flareChart.resize();});\n</script>\n</body>\n</html>`;\n\nconst base64 = Buffer.from(html, 'utf-8').toString('base64');\n\nconst summary = `🪐 APOD: ${apod.title || '(없음)'}\\n☄️ 오늘 근접 소행성 ${totalAsteroids}개 (잠재 위험 ${hazardous}개)\\n☀️ 지난 7일 태양 플레어 ${flareCount}건`;\n\nreturn [{\n  json: {\n    today,\n    apodTitle: apod.title || '',\n    apodUrl: apod.url || '',\n    totalAsteroids,\n    hazardous,\n    flareCount,\n    summary\n  },\n  binary: {\n    data: {\n      data: base64,\n      mimeType: 'text/html',\n      fileName: 'index.html'\n    }\n  }\n}];"
+      },
+      "id": "1a000000-0000-0000-0000-000000000006",
+      "name": "Build Dashboard HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "mode": "name",
+          "value": "REPLACE_WITH_GITHUB_OWNER"
+        },
+        "repository": {
+          "__rl": true,
+          "mode": "name",
+          "value": "REPLACE_WITH_REPO_NAME"
+        },
+        "filePath": "index.html",
+        "binaryData": true,
+        "binaryPropertyName": "data",
+        "commitMessage": "=chore: weekly NASA dashboard update ({{ $json.today }})",
+        "additionalParameters": {}
+      },
+      "id": "1a000000-0000-0000-0000-000000000007",
+      "name": "GitHub - Commit index.html",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        300
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "",
+          "name": "GitHub account - sujin"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#general"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ JSON.stringify({ blocks: [ { type: 'rich_text', elements: [ { type: 'rich_text_section', elements: [ { type: 'text', text: '🚀 NASA 우주 날씨 주간 리포트 (' + $json.today + ')\\n', style: { bold: true } } ] }, { type: 'rich_text_preformatted', elements: [ { type: 'text', text: $json.summary } ] }, { type: 'rich_text_section', elements: [ { type: 'link', url: 'https://REPLACE_WITH_GITHUB_OWNER.github.io/REPLACE_WITH_REPO_NAME/', text: '대시보드 보기' } ] } ] } ] }) }}",
+        "text": "=🚀 NASA 우주 날씨 주간 리포트 ({{ $json.today }})\n{{ $json.summary }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "id": "1a000000-0000-0000-0000-000000000008",
+      "name": "Slack - Send Summary",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1440,
+        300
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack account(team-datapopcorn) - Bot-Token"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "NASA - APOD",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "NASA - Asteroid Neo Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "NASA - DONKI Solar Flare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NASA - APOD": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NASA - Asteroid Neo Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "NASA - DONKI Solar Flare": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Build Dashboard HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dashboard HTML": {
+      "main": [
+        [
+          {
+            "node": "GitHub - Commit index.html",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub - Commit index.html": {
+      "main": [
+        [
+          {
+            "node": "Slack - Send Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "active": false,
+  "pinData": {}
+}
