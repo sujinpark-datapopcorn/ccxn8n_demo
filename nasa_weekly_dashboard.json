@@ -43,8 +43,8 @@
         }
       },
       "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
       "onError": "continueRegularOutput"
     },
     {
@@ -71,8 +71,8 @@
         }
       },
       "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
       "onError": "continueRegularOutput"
     },
     {
@@ -99,8 +99,8 @@
         }
       },
       "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
       "onError": "continueRegularOutput"
     },
     {
@@ -290,7 +290,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "timezone": "Asia/Seoul"
+    "timezone": "Asia/Seoul",
+    "executionTimeout": 600
   },
   "active": false,
   "pinData": {}
