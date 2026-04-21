@@ -16,7 +16,7 @@
   h1{margin:0;font-size:clamp(1.4rem,2.6vw,2.2rem);font-weight:900;letter-spacing:.02em;color:#ffb36a;text-shadow:0 0 6px #ff8a3c,0 0 18px #ff6a1f,0 0 36px rgba(255,138,60,.7)}
   .meta{color:#94a3b8;font-size:.8rem}
   .stats{position:relative;z-index:1;display:flex;gap:18px;flex-wrap:wrap}
-  .stat .num{font-size:1.4rem;font-weight:800;color:#ffd040;text-shadow:0 0 10px #ffd040aa}
+  .stat .num{font-size:1.4rem;font-weight:800;color:#ffd040;text-shadow:0 0 10px #ffd040aa;transition:color 2s ease,text-shadow 2s ease}
   .stat .lbl{color:#94a3b8;font-size:.75rem;margin-left:4px}
   .grid{display:grid;grid-template-columns:minmax(280px,1.1fr) minmax(420px,1.5fr) minmax(260px,1fr);grid-template-rows:1fr 1fr;gap:12px;min-height:0}
   h2{color:#a5b4fc;margin:0 0 10px;font-size:.95rem;letter-spacing:.02em}
@@ -78,6 +78,7 @@
       <button data-class="X">X</button>
       <button data-class="M">M</button>
       <button data-class="other">그 외</button>
+      <button data-class="astrophage">아스트로파지</button>
     </div>
     <div id="hero"></div>
   </div>
@@ -189,6 +190,11 @@
 
 <script>
 (function(){
+  // Shared fade state for 자동/X/M/그외/아스트로파지
+  const fade = {
+    sunOpacity: 1.0, sunOpacityTarget: 1.0,
+    starSpeed: 1.0, starSpeedTarget: 1.0,
+  };
   // --- Star canvas ---
   const starsCanvas = document.getElementById('stars');
   if (starsCanvas) {
@@ -211,7 +217,7 @@
     function tick(t){
       ctx.clearRect(0,0,W,H);
       for (const s of stars){
-        const a = 0.35 + 0.65 * (0.5 + 0.5*Math.sin(t*0.001*s.speed + s.phase));
+        const a = 0.35 + 0.65 * (0.5 + 0.5*Math.sin(t*0.001*s.speed*fade.starSpeed + s.phase));
         ctx.beginPath();
         ctx.fillStyle = 'rgba(255,230,200,' + a.toFixed(3) + ')';
         ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
@@ -288,15 +294,27 @@
 
     // Corona sample selector
     const sampleMap = { X: '#ff3030', M: '#ff9040', other: '#ffd040' };
+    const astrophageColor = '#8a98a8';
     const autoColor = '#ffd040';
-    const applyCorona = (hex) => {
-      const c = new THREE.Color(hex);
-      coronaMat.uniforms.uColor.value = c;
-      outerMat.uniforms.uColor.value = c;
+    const targetColor = new THREE.Color(autoColor);
+    const currentColor = new THREE.Color(autoColor);
+    const setStatColor = (hex) => {
       document.querySelectorAll('.stat .num').forEach(el => {
         el.style.color = hex;
         el.style.textShadow = '0 0 10px ' + hex + 'aa';
       });
+    };
+    const applyCorona = (hex) => {
+      targetColor.set(hex);
+      fade.sunOpacityTarget = 1.0;
+      fade.starSpeedTarget = 1.0;
+      setStatColor(hex);
+    };
+    const applyAstrophage = () => {
+      targetColor.set(astrophageColor);
+      fade.sunOpacityTarget = 0.6;
+      fade.starSpeedTarget = 0.5;
+      setStatColor(astrophageColor);
     };
     const sampleButtons = document.querySelectorAll('.sample button');
     sampleButtons.forEach(b => {
@@ -304,22 +322,32 @@
         sampleButtons.forEach(x => x.classList.remove('on'));
         b.classList.add('on');
         const k = b.dataset.class;
-        applyCorona(k === 'auto' ? autoColor : sampleMap[k]);
+        if (k === 'astrophage') applyAstrophage();
+        else applyCorona(k === 'auto' ? autoColor : sampleMap[k]);
       });
     });
     const urlClass = (new URLSearchParams(location.search)).get('class');
     if (urlClass) {
-      const key = urlClass.toUpperCase() === 'X' ? 'X'
-                : urlClass.toUpperCase() === 'M' ? 'M'
+      const upper = urlClass.toUpperCase();
+      const key = upper === 'ASTROPHAGE' ? 'astrophage'
+                : upper === 'X' ? 'X'
+                : upper === 'M' ? 'M'
                 : 'other';
       sampleButtons.forEach(x => x.classList.toggle('on', x.dataset.class === key));
-      applyCorona(sampleMap[key]);
+      if (key === 'astrophage') applyAstrophage();
+      else applyCorona(sampleMap[key]);
     }
 
     const start = performance.now();
+    const lerpRate = 0.015; // ~2.5s fade at 60fps
     function loop(){
       const t = (performance.now() - start) / 1000;
-      sun.rotation.y += 0.0025;
+      fade.sunOpacity += (fade.sunOpacityTarget - fade.sunOpacity) * lerpRate;
+      fade.starSpeed += (fade.starSpeedTarget - fade.starSpeed) * lerpRate;
+      currentColor.lerp(targetColor, lerpRate);
+      sunMat.opacity = fade.sunOpacity;
+      coronaMat.uniforms.uColor.value.copy(currentColor);
+      outerMat.uniforms.uColor.value.copy(currentColor);
       corona.rotation.y -= 0.001;
       coronaMat.uniforms.uTime.value = t;
       renderer.render(scene, camera);
