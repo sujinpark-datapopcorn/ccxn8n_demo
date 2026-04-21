@@ -3,71 +3,290 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NASA 우주 날씨 대시보드 - 2026-04-21</title>
+<title>나의 우주 대시보드 - 2026-04-21</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <style>
   *{box-sizing:border-box}
-  body{background:#0b0e14;color:#e6e6e6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:24px;line-height:1.5}
-  h1{color:#7dd3fc;margin:0 0 4px}
-  h2{color:#a5b4fc;margin-top:0;font-size:1.1rem}
-  h3{margin:8px 0;color:#fafafa}
-  .meta{color:#94a3b8;margin-bottom:24px;font-size:.9rem}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
-  .card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px}
-  .full{grid-column:1/-1}
-  .chart{width:100%;height:320px}
-  img{max-width:100%;border-radius:8px;display:block;margin:8px 0}
-  .stat{display:inline-block;margin-right:24px}
-  .stat .num{font-size:1.6rem;font-weight:bold;color:#38bdf8}
-  .stat .lbl{font-size:.85rem;color:#94a3b8;margin-left:4px}
+  html,body{margin:0;padding:0;background:#05070d;color:#e6e6e6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.55}
+  body{padding:0 24px 64px;max-width:1280px;margin:0 auto}
+  header{position:relative;padding:56px 0 24px;text-align:center;overflow:hidden}
+  #stars{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+  h1{position:relative;z-index:1;margin:0;font-size:clamp(2rem,5vw,3.6rem);font-weight:900;letter-spacing:.02em;color:#ffb36a;text-shadow:0 0 6px #ff8a3c,0 0 18px #ff6a1f,0 0 36px rgba(255,138,60,.7),0 0 72px rgba(255,106,31,.4)}
+  .meta{position:relative;z-index:1;color:#94a3b8;margin-top:8px;font-size:.9rem}
+  .stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin:12px 0 32px;position:relative;z-index:1}
+  .stat .num{font-size:2rem;font-weight:800;color:#ffd040;text-shadow:0 0 12px #ffd040aa}
+  .stat .lbl{color:#94a3b8;font-size:.85rem;margin-left:6px}
+  #hero{width:100%;height:520px;border-radius:16px;overflow:hidden;background:radial-gradient(ellipse at center,#1a0a05 0%,#05070d 70%);border:1px solid #21262d;margin-bottom:24px}
+  #hero canvas{display:block}
+  h2{color:#a5b4fc;margin:0 0 16px;font-size:1.1rem;letter-spacing:.02em}
+  .card{background:rgba(22,27,34,.85);backdrop-filter:blur(8px);border:1px solid #21262d;border-radius:14px;padding:24px;margin-bottom:24px}
+  .apod-body{display:grid;grid-template-columns:minmax(280px,1fr) 1.2fr;gap:24px;align-items:start}
+  .apod-body img{width:100%;border-radius:10px}
+  .apod-title{color:#fafafa;font-size:1.4rem;font-weight:700;margin:0 0 12px}
+  .apod-text{white-space:pre-wrap}
+  .apod-toggle{margin-top:12px;background:#161b22;border:1px solid #30363d;color:#7dd3fc;padding:8px 16px;border-radius:999px;cursor:pointer;font-size:.85rem}
+  .apod-toggle:hover{background:#1f2530}
   .empty{color:#94a3b8;font-style:italic;padding:24px;text-align:center}
+  .neo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .neo-card{background:#0b0e14;border:1px solid #21262d;border-radius:10px;padding:14px;position:relative}
+  .neo-card .name{color:#fafafa;font-weight:700;font-size:.95rem;margin-bottom:10px;padding-right:28px}
+  .neo-card .row{display:flex;justify-content:space-between;font-size:.85rem;color:#cbd5e1;margin-bottom:4px}
+  .neo-card .k{color:#64748b}
+  .neo-card .haz{position:absolute;top:10px;right:10px;background:#ff3030;color:#fff;font-size:.7rem;padding:2px 8px;border-radius:999px;font-weight:700}
+  #flare-chart{width:100%;height:360px}
+  @media (max-width:640px){ .apod-body{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
-<h1>🚀 NASA 우주 날씨 주간 대시보드</h1>
-<div class="meta">업데이트: 2026-04-21 · Asia/Seoul</div>
-<div class="card full" style="margin-bottom:16px">
-  <span class="stat"><span class="num">11</span><span class="lbl">근접 소행성</span></span>
-  <span class="stat"><span class="num">0</span><span class="lbl">잠재 위험</span></span>
-  <span class="stat"><span class="num">0</span><span class="lbl">7일 플레어</span></span>
+<header>
+  <canvas id="stars"></canvas>
+  <h1>나의 우주 대시보드</h1>
+  <div class="meta">업데이트 2026-04-21 · Asia/Seoul</div>
+  <div class="stats">
+    <span class="stat"><span class="num">11</span><span class="lbl">근접 소행성</span></span>
+    <span class="stat"><span class="num">0</span><span class="lbl">잠재 위험</span></span>
+    <span class="stat"><span class="num">0</span><span class="lbl">7일 플레어</span></span>
+  </div>
+</header>
+
+<div id="hero"></div>
+
+<div class="card">
+  <h2>오늘의 천문사진 (APOD)</h2>
+  
+    <div class="apod-body">
+      <div><img src="https://apod.nasa.gov/apod/image/2604/ValleyComet_Chakrabarti_960.jpg" alt="Comet R3 PanSTARRS over a Himalayan Valley"></div>
+      <div>
+        <div class="apod-title">Comet R3 PanSTARRS over a Himalayan Valley</div>
+        <div id="apod-ko" class="apod-text" >혜성 R3 PanSTARRS의 긴 꼬리를 보는 가장 좋은 방법은 카메라를 사용하는 것입니다. 이번 주, 최근에 밝아진 혜성은 새벽 직전 동쪽 북쪽 하늘에 나타나지만, 맨눈으로는 거의 보이지 않습니다. 긴 노출 카메라 촬영에서 포착된 여러 도의 이온 꼬리는 혜성에 흔한 현상입니다. 이는 태양과 반대 방향으로 꼬리가 향할 때 지구에서 거의 옆으로 보는 시점 때문입니다. 지난주에 촬영된 이미지에서 혜성 C/2025 R3 (PanSTARRS)는 인도의 히말라야 산맥의 두 봉우리 사이의 계곡을 통해 흐르는 꼬리를 드러냈습니다. 혜성은 어제 태양에 가장 가까이 접근했습니다. 다음 주 지구에 가장 가까워지면서, 털이 많은 먼지 꼬리가 보일 수 있습니다. 혜성은 북쪽 하늘에서 서서히 이동하고 있으며, 이달 말에는 저녁 노을 후 남쪽 하늘에서 볼 수 있게 될 것입니다. 그때까지 혜성은 점점 희미해지며 우리의 태양계를 떠날 것입니다.</div>
+        <div id="apod-en" class="apod-text" style="display:none">The best way to see comet R3 PanSTARRS’s long tail is with a camera. This week, the recently brightened comet appears in northern skies to the east just before dawn, but is only barely visible to the unaided eye. The many-degree ion tail captured on long duration camera exposures is not unusual for a comet - it is primarily due to the Earth&#39;s nearly sideways view of the tail as it points away from the Sun.  In the featured image taken last week, Comet C/2025 R3 (PanSTARRS) showed off its flowing tail through a valley between two peaks in the Himalayan mountains of India.   The comet passed its closest to the Sun yesterday. As it nears its closest approach to Earth next week, a bushy dust tail may become visible.  The comet is slowly moving out of northern skies and by the end of the month will be visible after sunset in southern skies as it fades and leaves our Solar System.    Growing Gallery: Comet R3 PanSTARRS in 2026</div>
+        <button class="apod-toggle" id="apod-btn">원문 보기</button>
+      </div>
+    </div>
+  
 </div>
-<div class="grid">
-  <div class="card full">
-    <h2>오늘의 천문사진 (APOD)</h2>
-    
-      <h3>Comet R3 PanSTARRS over a Himalayan Valley</h3>
-      <img src="https://apod.nasa.gov/apod/image/2604/ValleyComet_Chakrabarti_960.jpg" alt="Comet R3 PanSTARRS over a Himalayan Valley">
-      <p>The best way to see comet R3 PanSTARRS’s long tail is with a camera. This week, the recently brightened comet appears in northern skies to the east just before dawn, but is only barely visible to the unaided eye. The many-degree ion tail captured on long duration camera exposures is not unusual for a comet - it is primarily due to the Earth&#39;s nearly sideways view of the tail as it points away from the Sun.  In the featured image taken last week, Comet C/2025 R3 (PanSTARRS) showed off its flowing tail through a valley between two peaks in the Himalayan mountains of India.   The comet passed its…</p>
-    
-  </div>
-  <div class="card">
-    <h2>지구 근접 소행성</h2>
-    <div id="neo" class="chart"></div>
-  </div>
-  <div class="card">
-    <h2>태양 플레어 클래스 분포 (지난 7일)</h2>
-    <div class="empty">지난 7일 태양 플레어 관측 없음</div>
-  </div>
+
+<div class="card">
+  <h2>지구 근접 소행성 — 가까운 순</h2>
+  <div class="neo-grid">
+    <div class="neo-card">
+      
+      <div class="name">(2026 HJ1)</div>
+      <div class="row"><span class="k">지름</span><span>9 m</span></div>
+      <div class="row"><span class="k">거리</span><span>1.67 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>10.6 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2026 GJ1)</div>
+      <div class="row"><span class="k">지름</span><span>81 m</span></div>
+      <div class="row"><span class="k">거리</span><span>8.68 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>22.2 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2026 GZ1)</div>
+      <div class="row"><span class="k">지름</span><span>61 m</span></div>
+      <div class="row"><span class="k">거리</span><span>15.48 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>10.2 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2025 HQ4)</div>
+      <div class="row"><span class="k">지름</span><span>27 m</span></div>
+      <div class="row"><span class="k">거리</span><span>16.30 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>12.5 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2009 UC19)</div>
+      <div class="row"><span class="k">지름</span><span>39 m</span></div>
+      <div class="row"><span class="k">거리</span><span>39.13 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>8.8 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2021 JG3)</div>
+      <div class="row"><span class="k">지름</span><span>119 m</span></div>
+      <div class="row"><span class="k">거리</span><span>39.97 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>8.8 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2023 HM)</div>
+      <div class="row"><span class="k">지름</span><span>12 m</span></div>
+      <div class="row"><span class="k">거리</span><span>101.76 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>27.7 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2023 SL8)</div>
+      <div class="row"><span class="k">지름</span><span>57 m</span></div>
+      <div class="row"><span class="k">거리</span><span>102.84 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>8.8 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2016 NR)</div>
+      <div class="row"><span class="k">지름</span><span>75 m</span></div>
+      <div class="row"><span class="k">거리</span><span>119.07 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>7.7 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2016 AH164)</div>
+      <div class="row"><span class="k">지름</span><span>5 m</span></div>
+      <div class="row"><span class="k">거리</span><span>165.13 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>8.0 km/s</span></div>
+    </div>
+    <div class="neo-card">
+      
+      <div class="name">(2020 GX2)</div>
+      <div class="row"><span class="k">지름</span><span>22 m</span></div>
+      <div class="row"><span class="k">거리</span><span>186.31 LD</span></div>
+      <div class="row"><span class="k">속도</span><span>20.9 km/s</span></div>
+    </div></div>
 </div>
+
+<div class="card">
+  <h2>태양 플레어 산점도 (지난 7일)</h2>
+  <div class="empty">지난 7일 태양 플레어 관측 없음</div>
+</div>
+
 <script>
-const common = { backgroundColor:'transparent', textStyle:{color:'#e6e6e6'} };
+(function(){
+  // --- Star canvas ---
+  const starsCanvas = document.getElementById('stars');
+  if (starsCanvas) {
+    const ctx = starsCanvas.getContext('2d');
+    let W = 0, H = 0;
+    const stars = [];
+    function resize(){
+      W = starsCanvas.clientWidth; H = starsCanvas.clientHeight;
+      starsCanvas.width = W * devicePixelRatio; starsCanvas.height = H * devicePixelRatio;
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+    }
+    function seed(){
+      stars.length = 0;
+      for (let i=0;i<220;i++) stars.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.4+0.2, phase: Math.random()*Math.PI*2, speed: 0.5 + Math.random()*1.5 });
+    }
+    resize(); seed();
+    window.addEventListener('resize', ()=>{ resize(); seed(); });
+    function tick(t){
+      ctx.clearRect(0,0,W,H);
+      for (const s of stars){
+        const a = 0.35 + 0.65 * (0.5 + 0.5*Math.sin(t*0.001*s.speed + s.phase));
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255,230,200,' + a.toFixed(3) + ')';
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
 
-const neoChart = echarts.init(document.getElementById('neo'),'dark');
-neoChart.setOption({
-  ...common,
-  tooltip:{trigger:'axis'},
-  legend:{textStyle:{color:'#e6e6e6'}},
-  grid:{left:40,right:20,top:40,bottom:30},
-  xAxis:{type:'category',data:["2026-04-21"],axisLabel:{color:'#94a3b8'}},
-  yAxis:{type:'value',axisLabel:{color:'#94a3b8'}},
-  series:[
-    {name:'전체',type:'bar',data:[11],itemStyle:{color:'#38bdf8'}},
-    {name:'잠재 위험',type:'bar',data:[0],itemStyle:{color:'#f43f5e'}}
-  ]
-});
-window.addEventListener('resize',()=>neoChart.resize());
+  // --- Three.js Sun ---
+  const hero = document.getElementById('hero');
+  if (hero && window.THREE) {
+    const w = hero.clientWidth, h = hero.clientHeight;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+    camera.position.z = 5.5;
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(w, h);
+    hero.appendChild(renderer.domElement);
 
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.crossOrigin = 'anonymous';
+    const sunTex = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_sun.jpg');
+    const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, color: 0xffffff });
+    const sun = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), sunMat);
+    scene.add(sun);
 
+    const coronaColor = new THREE.Color('#ffd040');
+    const coronaMat = new THREE.ShaderMaterial({
+      uniforms: { uColor: { value: coronaColor }, uTime: { value: 0 } },
+      vertexShader: 'varying vec3 vNormal; varying vec3 vPos; void main(){ vNormal = normalize(normalMatrix * normal); vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+      fragmentShader: 'varying vec3 vNormal; uniform vec3 uColor; uniform float uTime; void main(){ float f = pow(1.0 - abs(vNormal.z), 3.2); float pulse = 0.85 + 0.15*sin(uTime*1.5); gl_FragColor = vec4(uColor * f * pulse, f*0.9); }',
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      depthWrite: false,
+    });
+    const corona = new THREE.Mesh(new THREE.SphereGeometry(2.7, 64, 64), coronaMat);
+    scene.add(corona);
+
+    const outerMat = new THREE.ShaderMaterial({
+      uniforms: { uColor: { value: coronaColor } },
+      vertexShader: 'varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+      fragmentShader: 'varying vec3 vN; uniform vec3 uColor; void main(){ float f = pow(1.0 - abs(vN.z), 6.0); gl_FragColor = vec4(uColor, f*0.5); }',
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      depthWrite: false,
+    });
+    const outerGlow = new THREE.Mesh(new THREE.SphereGeometry(3.3, 48, 48), outerMat);
+    scene.add(outerGlow);
+
+    window.addEventListener('resize', () => {
+      const w2 = hero.clientWidth, h2 = hero.clientHeight;
+      renderer.setSize(w2, h2);
+      camera.aspect = w2/h2;
+      camera.updateProjectionMatrix();
+    });
+
+    const start = performance.now();
+    function loop(){
+      const t = (performance.now() - start) / 1000;
+      sun.rotation.y += 0.0025;
+      corona.rotation.y -= 0.001;
+      coronaMat.uniforms.uTime.value = t;
+      renderer.render(scene, camera);
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  // --- APOD toggle ---
+  const btn = document.getElementById('apod-btn');
+  if (btn) {
+    const ko = document.getElementById('apod-ko');
+    const en = document.getElementById('apod-en');
+    btn.addEventListener('click', () => {
+      const showingKo = ko.style.display !== 'none';
+      ko.style.display = showingKo ? 'none' : '';
+      en.style.display = showingKo ? '' : 'none';
+      btn.textContent = showingKo ? '한국어 보기' : '원문 보기';
+    });
+  }
+
+  // --- Flare scatter ---
+  const flareEl = document.getElementById('flare-chart');
+  if (flareEl && window.echarts) {
+    const chart = echarts.init(flareEl, 'dark');
+    const data = [];
+    chart.setOption({
+      backgroundColor: 'transparent',
+      textStyle: { color: '#e6e6e6' },
+      grid: { left: 56, right: 24, top: 40, bottom: 48 },
+      tooltip: {
+        trigger: 'item',
+        formatter: function(p){
+          const d = p.data || {};
+          const when = d.peakTime ? new Date(d.peakTime).toLocaleString('ko-KR') : '';
+          return '<b>' + d.classType + '</b><br/>' + when + (d.sourceLocation ? '<br/>' + d.sourceLocation : '');
+        }
+      },
+      xAxis: { type: 'time', axisLabel: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1f2937' } } },
+      yAxis: { type: 'log', name: '강도', nameTextStyle: { color: '#94a3b8' }, axisLabel: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1f2937' } } },
+      series: [{ type: 'scatter', data: data, emphasis: { focus: 'self' } }]
+    });
+    window.addEventListener('resize', () => chart.resize());
+  }
+})();
 </script>
 </body>
 </html>
