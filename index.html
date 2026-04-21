@@ -24,6 +24,11 @@
   .card-body{flex:1;min-height:0;overflow:auto}
   #hero-card{grid-column:1;grid-row:1 / span 2;padding:0;border:1px solid #21262d;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at center,#1a0a05 0%,#05070d 70%);position:relative;min-height:0}
   #hero{position:absolute;inset:0}
+  .sample{position:absolute;top:10px;left:10px;z-index:2;display:flex;gap:6px;background:rgba(5,7,13,.65);backdrop-filter:blur(6px);border:1px solid #21262d;border-radius:999px;padding:4px 6px;font-size:.72rem}
+  .sample span{color:#94a3b8;padding:3px 8px;align-self:center}
+  .sample button{background:transparent;border:1px solid #30363d;color:#cbd5e1;border-radius:999px;padding:3px 10px;cursor:pointer;font-size:.7rem}
+  .sample button:hover{background:#161b22}
+  .sample button.on{background:#1f2530;color:#fff;border-color:#475569}
   #apod-card{grid-column:2;grid-row:1}
   #flare-card{grid-column:2;grid-row:2}
   #neo-card{grid-column:3;grid-row:1 / span 2}
@@ -66,7 +71,16 @@
 </header>
 
 <div class="grid">
-  <div id="hero-card"><div id="hero"></div></div>
+  <div id="hero-card">
+    <div class="sample">
+      <span>코로나</span>
+      <button data-class="auto" class="on">자동</button>
+      <button data-class="X">X</button>
+      <button data-class="M">M</button>
+      <button data-class="other">그 외</button>
+    </div>
+    <div id="hero"></div>
+  </div>
 
   <div id="apod-card" class="card">
     <h2>오늘의 천문사진 (APOD)</h2>
@@ -75,7 +89,7 @@
         <div class="apod-img-wrap"><img src="https://apod.nasa.gov/apod/image/2604/ValleyComet_Chakrabarti_960.jpg" alt="Comet R3 PanSTARRS over a Himalayan Valley"></div>
         <div class="apod-text-wrap">
           <div class="apod-title">Comet R3 PanSTARRS over a Himalayan Valley</div>
-          <div id="apod-ko" class="apod-text" >혜성 R3 PanSTARRS의 긴 꼬리를 가장 잘 보는 방법은 카메라를 사용하는 것입니다. 이번 주, 최근 밝아진 혜성은 새벽 직전 동쪽 북쪽 하늘에 나타나지만, 맨눈으로는 거의 보이지 않습니다. 긴 노출 카메라 촬영에서 포착된 여러 도의 이온 꼬리는 혜성에서 흔한 현상입니다. 이는 주로 태양과 반대 방향으로 꼬리가 향할 때 지구가 거의 옆에서 보는 시점 때문입니다. 지난 주 촬영된 이미지에서 혜성 C/2025 R3 (PanSTARRS)는 인도의 히말라야 산맥의 두 봉우리 사이의 계곡을 통해 흐르는 꼬리를 보여주었습니다. 혜성은 어제 태양에 가장 가까이 접근했습니다. 다음 주 지구에 가장 가까워질 때, 덤불 같은 먼지 꼬리가 보일 수 있습니다. 혜성은 북쪽 하늘에서 천천히 이동하고 있으며, 이달 말에는 저녁 노을 후 남쪽 하늘에서 보일 것입니다. 이때 혜성은 희미해지며 우리 태양계를 떠납니다.</div>
+          <div id="apod-ko" class="apod-text" >혜성 R3 PanSTARRS의 긴 꼬리를 가장 잘 보는 방법은 카메라를 사용하는 것입니다. 이번 주, 최근 밝아진 혜성은 새벽 직전에 동쪽 북쪽 하늘에 나타나지만, 맨눈으로는 거의 보이지 않습니다. 긴 노출 카메라 촬영에서 포착된 여러 도의 이온 꼬리는 혜성에선 드문 일이 아닙니다. 이는 주로 태양과 반대 방향을 가리키는 꼬리를 지구가 거의 옆에서 바라보는 때문입니다. 지난주 촬영된 사진에서 C/2025 R3 (PanSTARRS) 혜성은 인도의 히말라야 산맥의 두 봉우리 사이의 계곡을 통해 흐르는 꼬리를 보여주었습니다. 혜성은 어제 태양에 가장 가까이 접근했습니다. 다음 주 지구에 가장 가까워질 때, 덤불 같은 먼지 꼬리가 보일 수 있습니다. 혜성은 북쪽 하늘에서 천천히 이동하고 있으며, 이달 말에는 저녁 노을 후 남쪽 하늘에서 보일 것입니다. 그때까지 희미해지며 우리 태양계를 떠날 것입니다.</div>
           <div id="apod-en" class="apod-text" style="display:none">The best way to see comet R3 PanSTARRS’s long tail is with a camera. This week, the recently brightened comet appears in northern skies to the east just before dawn, but is only barely visible to the unaided eye. The many-degree ion tail captured on long duration camera exposures is not unusual for a comet - it is primarily due to the Earth&#39;s nearly sideways view of the tail as it points away from the Sun.  In the featured image taken last week, Comet C/2025 R3 (PanSTARRS) showed off its flowing tail through a valley between two peaks in the Himalayan mountains of India.   The comet passed its closest to the Sun yesterday. As it nears its closest approach to Earth next week, a bushy dust tail may become visible.  The comet is slowly moving out of northern skies and by the end of the month will be visible after sunset in southern skies as it fades and leaves our Solar System.    Growing Gallery: Comet R3 PanSTARRS in 2026</div>
           <button class="apod-toggle" id="apod-btn">원문 보기</button>
         </div>
@@ -224,8 +238,14 @@
     const textureLoader = new THREE.TextureLoader();
     textureLoader.crossOrigin = 'anonymous';
     const sunTex = textureLoader.load('./assets/sun.jpg');
-    const sunMat = new THREE.MeshBasicMaterial({ map: sunTex });
-    const sun = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), sunMat);
+    const sunMat = new THREE.SpriteMaterial({
+      map: sunTex,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const sun = new THREE.Sprite(sunMat);
+    sun.scale.set(4, 4, 1);
     sun.renderOrder = 0;
     scene.add(sun);
 
@@ -265,6 +285,36 @@
       camera.updateProjectionMatrix();
     };
     window.addEventListener('resize', resizeHero);
+
+    // Corona sample selector
+    const sampleMap = { X: '#ff3030', M: '#ff9040', other: '#ffd040' };
+    const autoColor = '#ffd040';
+    const applyCorona = (hex) => {
+      const c = new THREE.Color(hex);
+      coronaMat.uniforms.uColor.value = c;
+      outerMat.uniforms.uColor.value = c;
+      document.querySelectorAll('.stat .num').forEach(el => {
+        el.style.color = hex;
+        el.style.textShadow = '0 0 10px ' + hex + 'aa';
+      });
+    };
+    const sampleButtons = document.querySelectorAll('.sample button');
+    sampleButtons.forEach(b => {
+      b.addEventListener('click', () => {
+        sampleButtons.forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        const k = b.dataset.class;
+        applyCorona(k === 'auto' ? autoColor : sampleMap[k]);
+      });
+    });
+    const urlClass = (new URLSearchParams(location.search)).get('class');
+    if (urlClass) {
+      const key = urlClass.toUpperCase() === 'X' ? 'X'
+                : urlClass.toUpperCase() === 'M' ? 'M'
+                : 'other';
+      sampleButtons.forEach(x => x.classList.toggle('on', x.dataset.class === key));
+      applyCorona(sampleMap[key]);
+    }
 
     const start = performance.now();
     function loop(){
