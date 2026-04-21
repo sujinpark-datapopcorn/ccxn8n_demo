@@ -20,60 +20,54 @@
   .stat{display:inline-block;margin-right:24px}
   .stat .num{font-size:1.6rem;font-weight:bold;color:#38bdf8}
   .stat .lbl{font-size:.85rem;color:#94a3b8;margin-left:4px}
+  .empty{color:#94a3b8;font-style:italic;padding:24px;text-align:center}
 </style>
 </head>
 <body>
 <h1>🚀 NASA 우주 날씨 주간 대시보드</h1>
 <div class="meta">업데이트: 2026-04-21 · Asia/Seoul</div>
 <div class="card full" style="margin-bottom:16px">
-  <span class="stat"><span class="num">0</span><span class="lbl">근접 소행성</span></span>
+  <span class="stat"><span class="num">11</span><span class="lbl">근접 소행성</span></span>
   <span class="stat"><span class="num">0</span><span class="lbl">잠재 위험</span></span>
   <span class="stat"><span class="num">0</span><span class="lbl">7일 플레어</span></span>
 </div>
 <div class="grid">
   <div class="card full">
     <h2>오늘의 천문사진 (APOD)</h2>
-    <h3></h3>
     
-    <p></p>
+      <h3>Comet R3 PanSTARRS over a Himalayan Valley</h3>
+      <img src="https://apod.nasa.gov/apod/image/2604/ValleyComet_Chakrabarti_960.jpg" alt="Comet R3 PanSTARRS over a Himalayan Valley">
+      <p>The best way to see comet R3 PanSTARRS’s long tail is with a camera. This week, the recently brightened comet appears in northern skies to the east just before dawn, but is only barely visible to the unaided eye. The many-degree ion tail captured on long duration camera exposures is not unusual for a comet - it is primarily due to the Earth&#39;s nearly sideways view of the tail as it points away from the Sun.  In the featured image taken last week, Comet C/2025 R3 (PanSTARRS) showed off its flowing tail through a valley between two peaks in the Himalayan mountains of India.   The comet passed its…</p>
+    
   </div>
   <div class="card">
-    <h2>지구 근접 소행성 (오늘)</h2>
+    <h2>지구 근접 소행성</h2>
     <div id="neo" class="chart"></div>
   </div>
   <div class="card">
     <h2>태양 플레어 클래스 분포 (지난 7일)</h2>
-    <div id="flare" class="chart"></div>
+    <div class="empty">지난 7일 태양 플레어 관측 없음</div>
   </div>
 </div>
 <script>
 const common = { backgroundColor:'transparent', textStyle:{color:'#e6e6e6'} };
+
 const neoChart = echarts.init(document.getElementById('neo'),'dark');
 neoChart.setOption({
   ...common,
   tooltip:{trigger:'axis'},
   legend:{textStyle:{color:'#e6e6e6'}},
   grid:{left:40,right:20,top:40,bottom:30},
-  xAxis:{type:'category',data:[],axisLabel:{color:'#94a3b8'}},
+  xAxis:{type:'category',data:["2026-04-21"],axisLabel:{color:'#94a3b8'}},
   yAxis:{type:'value',axisLabel:{color:'#94a3b8'}},
   series:[
-    {name:'전체',type:'bar',data:[],itemStyle:{color:'#38bdf8'}},
-    {name:'잠재 위험',type:'bar',data:[],itemStyle:{color:'#f43f5e'}}
+    {name:'전체',type:'bar',data:[11],itemStyle:{color:'#38bdf8'}},
+    {name:'잠재 위험',type:'bar',data:[0],itemStyle:{color:'#f43f5e'}}
   ]
 });
-const flareChart = echarts.init(document.getElementById('flare'),'dark');
-flareChart.setOption({
-  ...common,
-  tooltip:{trigger:'item'},
-  legend:{bottom:0,textStyle:{color:'#e6e6e6'}},
-  series:[{
-    name:'클래스',type:'pie',radius:['40%','65%'],
-    data:[],
-    label:{color:'#e6e6e6'},
-    itemStyle:{borderColor:'#0b0e14',borderWidth:2}
-  }]
-});
-window.addEventListener('resize',()=>{neoChart.resize();flareChart.resize();});
+window.addEventListener('resize',()=>neoChart.resize());
+
+
 </script>
 </body>
 </html>
