@@ -59,7 +59,7 @@
       <div><img src="https://apod.nasa.gov/apod/image/2604/ValleyComet_Chakrabarti_960.jpg" alt="Comet R3 PanSTARRS over a Himalayan Valley"></div>
       <div>
         <div class="apod-title">Comet R3 PanSTARRS over a Himalayan Valley</div>
-        <div id="apod-ko" class="apod-text" >혜성 R3 PanSTARRS의 긴 꼬리를 보는 가장 좋은 방법은 카메라를 사용하는 것입니다. 이번 주, 최근에 밝아진 혜성은 새벽 직전 동쪽 북쪽 하늘에 나타나지만, 맨눈으로는 거의 보이지 않습니다. 긴 노출 카메라 촬영에서 포착된 여러 도의 이온 꼬리는 혜성에 흔한 현상입니다. 이는 태양과 반대 방향으로 꼬리가 향할 때 지구에서 거의 옆으로 보는 시점 때문입니다. 지난주에 촬영된 이미지에서 혜성 C/2025 R3 (PanSTARRS)는 인도의 히말라야 산맥의 두 봉우리 사이의 계곡을 통해 흐르는 꼬리를 드러냈습니다. 혜성은 어제 태양에 가장 가까이 접근했습니다. 다음 주 지구에 가장 가까워지면서, 털이 많은 먼지 꼬리가 보일 수 있습니다. 혜성은 북쪽 하늘에서 서서히 이동하고 있으며, 이달 말에는 저녁 노을 후 남쪽 하늘에서 볼 수 있게 될 것입니다. 그때까지 혜성은 점점 희미해지며 우리의 태양계를 떠날 것입니다.</div>
+        <div id="apod-ko" class="apod-text" >혜성 R3 PanSTARRS의 긴 꼬리를 가장 잘 보기 위해서는 카메라가 필요합니다. 이번 주, 최근 밝아진 이 혜성은 새벽 직전 동쪽 북쪽 하늘에 나타나지만, 맨눈으로는 거의 보이지 않습니다. 긴 노출 카메라로 촬영한 여러 도의 이온 꼬리는 혜성에서 흔한 현상입니다. 이는 주로 태양에서 멀어지는 꼬리를 지구가 거의 옆에서 바라보는 시점 때문입니다. 지난 주 촬영된 이미지에서 C/2025 R3 (PanSTARRS) 혜성은 인도 히말라야의 두 봉우리 사이의 계곡을 통해 흐르는 꼬리를 보여주었습니다. 이 혜성은 어제 태양에 가장 가까이 접근했습니다. 다음 주 지구에 가장 가까워지면서, 덤불 같은 먼지 꼬리가 보일 수 있습니다. 혜성은 북쪽 하늘에서 천천히 이동하고 있으며, 이달 말에는 남쪽 하늘에서 해가 진 후에 보일 것입니다. 이때 혜성은 희미해지며 우리 태양계를 떠날 것입니다.</div>
         <div id="apod-en" class="apod-text" style="display:none">The best way to see comet R3 PanSTARRS’s long tail is with a camera. This week, the recently brightened comet appears in northern skies to the east just before dawn, but is only barely visible to the unaided eye. The many-degree ion tail captured on long duration camera exposures is not unusual for a comet - it is primarily due to the Earth&#39;s nearly sideways view of the tail as it points away from the Sun.  In the featured image taken last week, Comet C/2025 R3 (PanSTARRS) showed off its flowing tail through a valley between two peaks in the Himalayan mountains of India.   The comet passed its closest to the Sun yesterday. As it nears its closest approach to Earth next week, a bushy dust tail may become visible.  The comet is slowly moving out of northern skies and by the end of the month will be visible after sunset in southern skies as it fades and leaves our Solar System.    Growing Gallery: Comet R3 PanSTARRS in 2026</div>
         <button class="apod-toggle" id="apod-btn">원문 보기</button>
       </div>
@@ -201,8 +201,8 @@
 
     const textureLoader = new THREE.TextureLoader();
     textureLoader.crossOrigin = 'anonymous';
-    const sunTex = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_sun.jpg');
-    const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, color: 0xffffff });
+    const sunTex = textureLoader.load('./assets/sun.jpg');
+    const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, color: 0xffaa55 });
     const sun = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), sunMat);
     scene.add(sun);
 
