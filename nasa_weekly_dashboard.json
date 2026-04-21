@@ -177,7 +177,7 @@
           "value": "#general"
         },
         "messageType": "block",
-        "blocksUi": "={{ JSON.stringify({ blocks: [ { type: 'rich_text', elements: [ { type: 'rich_text_section', elements: [ { type: 'text', text: '🚀 NASA 우주 날씨 주간 리포트 (' + $json.today + ')\\n', style: { bold: true } } ] }, { type: 'rich_text_preformatted', elements: [ { type: 'text', text: $json.summary } ] }, { type: 'rich_text_section', elements: [ { type: 'link', url: 'https://sujinpark-datapopcorn.github.io/ccxn8n_demo/', text: '대시보드 보기' } ] } ] } ] }) }}",
+        "blocksUi": "={{ JSON.stringify([{ type: 'header', text: { type: 'plain_text', text: '🚀 NASA 우주 날씨 주간 리포트', emoji: true } },{ type: 'section', text: { type: 'mrkdwn', text: '*' + $json.today + '*' } },{ type: 'section', text: { type: 'mrkdwn', text: '```' + $json.summary + '```' } },{ type: 'actions', elements: [ { type: 'button', text: { type: 'plain_text', text: '대시보드 보기', emoji: true }, url: 'https://sujinpark-datapopcorn.github.io/ccxn8n_demo/' } ] }]) }}",
         "text": "=🚀 NASA 우주 날씨 주간 리포트 ({{ $json.today }})\n{{ $json.summary }}",
         "otherOptions": {
           "includeLinkToWorkflow": false
