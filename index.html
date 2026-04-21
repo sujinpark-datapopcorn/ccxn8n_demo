@@ -4,25 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>나의 우주 대시보드 - 2026-04-21</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <style>
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#05070d;color:#e6e6e6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.5}
-  body{height:100vh;overflow:hidden;padding:14px;display:grid;grid-template-rows:auto 1fr;gap:12px}
+  html,body{margin:0;padding:0;color:#e6e6e6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.5}
+  body{height:100vh;overflow:hidden;padding:14px;display:grid;grid-template-rows:auto 1fr;gap:12px;background:
+    repeating-linear-gradient(0deg, rgba(106,169,255,.035) 0 1px, transparent 1px 80px),
+    repeating-linear-gradient(90deg, rgba(106,169,255,.035) 0 1px, transparent 1px 80px),
+    radial-gradient(ellipse at 50% 0%, #0a1022 0%, #05070d 60%)}
   header{position:relative;padding:8px 16px;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:60px}
   #stars{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
   .title-wrap{position:relative;z-index:1;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
-  h1{margin:0;font-size:clamp(1.4rem,2.6vw,2.2rem);font-weight:900;letter-spacing:.02em;color:#ffb36a;text-shadow:0 0 6px #ff8a3c,0 0 18px #ff6a1f,0 0 36px rgba(255,138,60,.7)}
-  .meta{color:#94a3b8;font-size:.8rem}
+  h1{margin:0;font-family:'Orbitron',sans-serif;font-size:clamp(1.4rem,2.6vw,2.2rem);font-weight:900;letter-spacing:.08em;color:#ffb36a;text-shadow:0 0 6px #ff8a3c,0 0 18px #ff6a1f,0 0 36px rgba(255,138,60,.7)}
+  .meta{color:#94a3b8;font-size:.78rem;font-family:'Share Tech Mono',monospace;letter-spacing:.05em}
   .stats{position:relative;z-index:1;display:flex;gap:18px;flex-wrap:wrap}
-  .stat .num{font-size:1.4rem;font-weight:800;color:#ffd040;text-shadow:0 0 10px #ffd040aa;transition:color 2s ease,text-shadow 2s ease}
-  .stat .lbl{color:#94a3b8;font-size:.75rem;margin-left:4px}
+  .stat .num{font-family:'Share Tech Mono',monospace;font-size:1.55rem;font-weight:400;color:#ff3030;text-shadow:0 0 10px #ff3030aa;transition:color 2s ease,text-shadow 2s ease}
+  .stat .lbl{color:#94a3b8;font-size:.7rem;margin-left:4px;font-family:'Share Tech Mono',monospace;letter-spacing:.05em;text-transform:uppercase}
   .grid{display:grid;grid-template-columns:minmax(280px,1.1fr) minmax(420px,1.5fr) minmax(260px,1fr);grid-template-rows:1fr 1fr;gap:12px;min-height:0}
-  h2{color:#a5b4fc;margin:0 0 10px;font-size:.95rem;letter-spacing:.02em}
-  .card{background:rgba(22,27,34,.85);border:1px solid #21262d;border-radius:12px;padding:14px;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+  h2{color:#cbd5e1;margin:0 0 10px;font-size:.8rem;letter-spacing:.12em;font-family:'Share Tech Mono',monospace;text-transform:uppercase;font-weight:400}
+  h2::before{content:attr(data-idx) ' / ';color:#6aa9ff;margin-right:4px;font-weight:700}
+  .card{position:relative;background:rgba(12,17,24,.82);border:1px solid #1b2330;border-radius:10px;padding:14px;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+  .card::before,.card::after{content:'';position:absolute;width:14px;height:14px;border-style:solid;border-color:#6aa9ff;pointer-events:none}
+  .card::before{top:-1px;left:-1px;border-width:2px 0 0 2px;border-top-left-radius:10px}
+  .card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;border-bottom-right-radius:10px}
   .card-body{flex:1;min-height:0;overflow:auto}
-  #hero-card{grid-column:1;grid-row:1 / span 2;padding:0;border:1px solid #21262d;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at center,#1a0a05 0%,#05070d 70%);position:relative;min-height:0}
+  #hero-card{grid-column:1;grid-row:1 / span 2;padding:0;border:1px solid #1b2330;border-radius:10px;overflow:hidden;background:radial-gradient(ellipse at center,#1a0a05 0%,#05070d 70%);position:relative;min-height:0}
+  #hero-card::before,#hero-card::after{content:'';position:absolute;width:14px;height:14px;border-style:solid;border-color:#ff8a3c;pointer-events:none;z-index:3}
+  #hero-card::before{top:-1px;left:-1px;border-width:2px 0 0 2px;border-top-left-radius:10px}
+  #hero-card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;border-bottom-right-radius:10px}
+  #hero-label{position:absolute;bottom:10px;left:12px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:#94a3b8;letter-spacing:.1em}
+  #hero-label .k{color:#6aa9ff}
+  #hero-label .dot{display:inline-block;width:6px;height:6px;background:#ffd040;border-radius:50%;margin-right:6px;box-shadow:0 0 6px #ffd040;animation:pulseDot 2s ease-in-out infinite}
+  @keyframes pulseDot{0%,100%{opacity:.45}50%{opacity:1}}
   #hero{position:absolute;inset:0}
   .sample{position:absolute;top:10px;left:10px;z-index:2;display:flex;gap:6px;background:rgba(5,7,13,.65);backdrop-filter:blur(6px);border:1px solid #21262d;border-radius:999px;padding:4px 6px;font-size:.72rem}
   .sample span{color:#94a3b8;padding:3px 8px;align-self:center}
@@ -43,11 +60,15 @@
   .empty{color:#94a3b8;font-style:italic;padding:14px;text-align:center;font-size:.85rem}
   .neo-grid{display:flex;flex-direction:column;gap:8px}
   .neo-card{background:#0b0e14;border:1px solid #21262d;border-radius:8px;padding:10px;position:relative}
-  .neo-card .name{color:#fafafa;font-weight:700;font-size:.8rem;margin-bottom:6px;padding-right:40px}
-  .neo-card .row{display:flex;justify-content:space-between;font-size:.75rem;color:#cbd5e1;margin-bottom:2px}
-  .neo-card .k{color:#64748b}
+  .neo-card .name{color:#fafafa;font-weight:700;font-size:.8rem;margin-bottom:6px;padding-right:40px;font-family:'Share Tech Mono',monospace;letter-spacing:.03em}
+  .neo-card .row{display:flex;justify-content:space-between;font-size:.75rem;color:#cbd5e1;margin-bottom:2px;font-family:'Share Tech Mono',monospace}
+  .neo-card .k{color:#6aa9ff;text-transform:uppercase;letter-spacing:.06em;font-size:.7rem}
   .neo-card .haz{position:absolute;top:8px;right:8px;background:#ff3030;color:#fff;font-size:.6rem;padding:1px 6px;border-radius:999px;font-weight:700}
   #flare-chart{width:100%;height:100%;flex:1;min-height:0}
+  .quiet-overlay{position:absolute;inset:40px 0 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;color:#6aa9ff;font-family:'Share Tech Mono',monospace;letter-spacing:.15em;gap:6px}
+  .quiet-overlay .dot{width:8px;height:8px;background:#6aa9ff;border-radius:50%;box-shadow:0 0 10px #6aa9ff;animation:pulseDot 2s ease-in-out infinite}
+  .quiet-overlay .label{font-size:.95rem;color:#cbd5e1;font-weight:700}
+  .quiet-overlay .sub{font-size:.75rem;color:#64748b;letter-spacing:.08em}
   @media (max-width:1100px){
     body{height:auto;overflow:auto}
     .grid{grid-template-columns:1fr;grid-template-rows:auto}
@@ -66,7 +87,7 @@
   <div class="stats">
     <span class="stat"><span class="num">11</span><span class="lbl">근접 소행성</span></span>
     <span class="stat"><span class="num">0</span><span class="lbl">잠재 위험</span></span>
-    <span class="stat"><span class="num">0</span><span class="lbl">7일 플레어</span></span>
+    <span class="stat"><span class="num">21</span><span class="lbl">7일 플레어</span></span>
   </div>
 </header>
 
@@ -81,10 +102,11 @@
       <button data-class="astrophage">아스트로파지</button>
     </div>
     <div id="hero"></div>
+    <div id="hero-label"><span class="dot"></span><span class="k">SDO · AIA 171 Å</span> · ARCHIVED 2026-04-21</div>
   </div>
 
   <div id="apod-card" class="card">
-    <h2>오늘의 천문사진 (APOD)</h2>
+    <h2 data-idx="01">오늘의 천문사진 (APOD)</h2>
     
       <div class="apod-body">
         <div class="apod-img-wrap"><img src="https://apod.nasa.gov/apod/image/2604/ValleyComet_Chakrabarti_960.jpg" alt="Comet R3 PanSTARRS over a Himalayan Valley"></div>
@@ -99,12 +121,13 @@
   </div>
 
   <div id="flare-card" class="card">
-    <h2>태양 플레어 산점도 (지난 7일)</h2>
-    <div class="empty">지난 7일 태양 플레어 관측 없음</div>
+    <h2 data-idx="02">태양 플레어 산점도 (지난 30일)</h2>
+    <div id="flare-chart"></div>
+    
   </div>
 
   <div id="neo-card" class="card">
-    <h2>지구 근접 소행성 — 가까운 순</h2>
+    <h2 data-idx="03">지구 근접 소행성 — 가까운 순</h2>
     <div class="card-body">
     <div class="neo-grid">
       <div class="neo-card">
@@ -255,7 +278,7 @@
     sun.renderOrder = 0;
     scene.add(sun);
 
-    const coronaColor = new THREE.Color('#ffd040');
+    const coronaColor = new THREE.Color('#ff3030');
     const coronaMat = new THREE.ShaderMaterial({
       uniforms: { uColor: { value: coronaColor }, uTime: { value: 0 } },
       vertexShader: 'varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
@@ -295,7 +318,7 @@
     // Corona sample selector
     const sampleMap = { X: '#ff3030', M: '#ff9040', other: '#ffd040' };
     const astrophageColor = '#8a98a8';
-    const autoColor = '#ffd040';
+    const autoColor = '#ff3030';
     const targetColor = new THREE.Color(autoColor);
     const currentColor = new THREE.Color(autoColor);
     const setStatColor = (hex) => {
@@ -373,7 +396,7 @@
   const flareEl = document.getElementById('flare-chart');
   if (flareEl && window.echarts) {
     const chart = echarts.init(flareEl, 'dark');
-    const data = [];
+    const data = [{"value":[1774220940000,0.15000000000000002],"classType":"C1.5","sourceLocation":"S15W67","peakTime":"2026-03-22T23:09Z","itemStyle":{"color":"#84cc16"},"symbolSize":15},{"value":[1774224720000,0.34],"classType":"C3.4","sourceLocation":"S15W72","peakTime":"2026-03-23T00:12Z","itemStyle":{"color":"#84cc16"},"symbolSize":34},{"value":[1774374840000,0.7200000000000001],"classType":"C7.2","sourceLocation":"N12E90","peakTime":"2026-03-24T17:54Z","itemStyle":{"color":"#84cc16"},"symbolSize":72},{"value":[1774397520000,0.29],"classType":"C2.9","sourceLocation":"S14W52","peakTime":"2026-03-25T00:12Z","itemStyle":{"color":"#84cc16"},"symbolSize":29},{"value":[1774506180000,3.9],"classType":"M3.9","sourceLocation":"N15E60","peakTime":"2026-03-26T06:23Z","itemStyle":{"color":"#ff9040"},"symbolSize":39},{"value":[1774671480000,1.3],"classType":"M1.3","sourceLocation":"S24E70","peakTime":"2026-03-28T04:18Z","itemStyle":{"color":"#ff9040"},"symbolSize":13},{"value":[1774697700000,0.41],"classType":"C4.1","sourceLocation":"N15E57","peakTime":"2026-03-28T11:35Z","itemStyle":{"color":"#84cc16"},"symbolSize":41},{"value":[1774840740000,14],"classType":"X1.4","sourceLocation":"S27E45","peakTime":"2026-03-30T03:19Z","itemStyle":{"color":"#ff3030"},"symbolSize":14},{"value":[1774918860000,0.15000000000000002],"classType":"C1.5","sourceLocation":"N16E00","peakTime":"2026-03-31T01:01Z","itemStyle":{"color":"#84cc16"},"symbolSize":15},{"value":[1774953540000,0.11000000000000001],"classType":"C1.1","sourceLocation":"N16W05","peakTime":"2026-03-31T10:39Z","itemStyle":{"color":"#84cc16"},"symbolSize":11},{"value":[1775051280000,0.53],"classType":"C5.3","sourceLocation":"N02E30","peakTime":"2026-04-01T13:48Z","itemStyle":{"color":"#84cc16"},"symbolSize":53},{"value":[1775086080000,0.61],"classType":"C6.1","sourceLocation":"N20W23","peakTime":"2026-04-01T23:28Z","itemStyle":{"color":"#84cc16"},"symbolSize":61},{"value":[1775153700000,3.5],"classType":"M3.5","sourceLocation":"N12W18","peakTime":"2026-04-02T18:15Z","itemStyle":{"color":"#ff9040"},"symbolSize":35},{"value":[1775202960000,1.3],"classType":"M1.3","sourceLocation":"N02E07","peakTime":"2026-04-03T07:56Z","itemStyle":{"color":"#ff9040"},"symbolSize":13},{"value":[1775220600000,1.3],"classType":"M1.3","sourceLocation":"N02E04","peakTime":"2026-04-03T12:50Z","itemStyle":{"color":"#ff9040"},"symbolSize":13},{"value":[1775265420000,7.5],"classType":"M7.5","sourceLocation":"N02W02","peakTime":"2026-04-04T01:17Z","itemStyle":{"color":"#ff9040"},"symbolSize":75},{"value":[1775289480000,1.7],"classType":"M1.7","sourceLocation":"N03W07","peakTime":"2026-04-04T07:58Z","itemStyle":{"color":"#ff9040"},"symbolSize":17},{"value":[1775304660000,1.2],"classType":"M1.2","sourceLocation":"N02W09","peakTime":"2026-04-04T12:11Z","itemStyle":{"color":"#ff9040"},"symbolSize":12},{"value":[1775343840000,1],"classType":"M1.0","sourceLocation":"N03W16","peakTime":"2026-04-04T23:04Z","itemStyle":{"color":"#ff9040"},"symbolSize":10},{"value":[1775604000000,0.24],"classType":"C2.4","sourceLocation":"N18E75","peakTime":"2026-04-07T23:20Z","itemStyle":{"color":"#84cc16"},"symbolSize":24},{"value":[1775724300000,1],"classType":"M1.0","sourceLocation":"N01W76","peakTime":"2026-04-09T08:45Z","itemStyle":{"color":"#ff9040"},"symbolSize":10}];
     chart.setOption({
       backgroundColor: 'transparent',
       textStyle: { color: '#e6e6e6' },
