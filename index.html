@@ -2,9 +2,78 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>NASA Weekly Space Weather Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NASA 우주 날씨 대시보드 - 2026-04-21</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{background:#0b0e14;color:#e6e6e6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:24px;line-height:1.5}
+  h1{color:#7dd3fc;margin:0 0 4px}
+  h2{color:#a5b4fc;margin-top:0;font-size:1.1rem}
+  h3{margin:8px 0;color:#fafafa}
+  .meta{color:#94a3b8;margin-bottom:24px;font-size:.9rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
+  .card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px}
+  .full{grid-column:1/-1}
+  .chart{width:100%;height:320px}
+  img{max-width:100%;border-radius:8px;display:block;margin:8px 0}
+  .stat{display:inline-block;margin-right:24px}
+  .stat .num{font-size:1.6rem;font-weight:bold;color:#38bdf8}
+  .stat .lbl{font-size:.85rem;color:#94a3b8;margin-left:4px}
+</style>
 </head>
 <body>
-<p>Waiting for first workflow run...</p>
+<h1>🚀 NASA 우주 날씨 주간 대시보드</h1>
+<div class="meta">업데이트: 2026-04-21 · Asia/Seoul</div>
+<div class="card full" style="margin-bottom:16px">
+  <span class="stat"><span class="num">0</span><span class="lbl">근접 소행성</span></span>
+  <span class="stat"><span class="num">0</span><span class="lbl">잠재 위험</span></span>
+  <span class="stat"><span class="num">0</span><span class="lbl">7일 플레어</span></span>
+</div>
+<div class="grid">
+  <div class="card full">
+    <h2>오늘의 천문사진 (APOD)</h2>
+    <h3></h3>
+    
+    <p></p>
+  </div>
+  <div class="card">
+    <h2>지구 근접 소행성 (오늘)</h2>
+    <div id="neo" class="chart"></div>
+  </div>
+  <div class="card">
+    <h2>태양 플레어 클래스 분포 (지난 7일)</h2>
+    <div id="flare" class="chart"></div>
+  </div>
+</div>
+<script>
+const common = { backgroundColor:'transparent', textStyle:{color:'#e6e6e6'} };
+const neoChart = echarts.init(document.getElementById('neo'),'dark');
+neoChart.setOption({
+  ...common,
+  tooltip:{trigger:'axis'},
+  legend:{textStyle:{color:'#e6e6e6'}},
+  grid:{left:40,right:20,top:40,bottom:30},
+  xAxis:{type:'category',data:[],axisLabel:{color:'#94a3b8'}},
+  yAxis:{type:'value',axisLabel:{color:'#94a3b8'}},
+  series:[
+    {name:'전체',type:'bar',data:[],itemStyle:{color:'#38bdf8'}},
+    {name:'잠재 위험',type:'bar',data:[],itemStyle:{color:'#f43f5e'}}
+  ]
+});
+const flareChart = echarts.init(document.getElementById('flare'),'dark');
+flareChart.setOption({
+  ...common,
+  tooltip:{trigger:'item'},
+  legend:{bottom:0,textStyle:{color:'#e6e6e6'}},
+  series:[{
+    name:'클래스',type:'pie',radius:['40%','65%'],
+    data:[],
+    label:{color:'#e6e6e6'},
+    itemStyle:{borderColor:'#0b0e14',borderWidth:2}
+  }]
+});
+window.addEventListener('resize',()=>{neoChart.resize();flareChart.resize();});
+</script>
 </body>
 </html>
