@@ -26,7 +26,9 @@
         "resource": "astronomyPictureOfTheDay",
         "operation": "get",
         "download": false,
-        "additionalFields": {}
+        "additionalFields": {
+          "date": "={{ $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }}"
+        }
       },
       "id": "1a000000-0000-0000-0000-000000000002",
       "name": "NASA - APOD",
@@ -174,11 +176,11 @@
         "channelId": {
           "__rl": true,
           "mode": "name",
-          "value": "#general"
+          "value": "#test-workflow"
         },
         "messageType": "block",
-        "blocksUi": "={{ JSON.stringify([{ type: 'header', text: { type: 'plain_text', text: '🚀 NASA 우주 날씨 주간 리포트', emoji: true } },{ type: 'section', text: { type: 'mrkdwn', text: '*' + $json.today + '*' } },{ type: 'section', text: { type: 'mrkdwn', text: '```' + $json.summary + '```' } },{ type: 'actions', elements: [ { type: 'button', text: { type: 'plain_text', text: '대시보드 보기', emoji: true }, url: 'https://sujinpark-datapopcorn.github.io/ccxn8n_demo/' } ] }]) }}",
-        "text": "=🚀 NASA 우주 날씨 주간 리포트 ({{ $json.today }})\n{{ $json.summary }}",
+        "blocksUi": "={{ JSON.stringify([{ type: 'header', text: { type: 'plain_text', text: '🚀 NASA 우주 날씨 주간 리포트', emoji: true } },{ type: 'section', text: { type: 'mrkdwn', text: '*' + $('Build Dashboard HTML').item.json.today + '*' } },{ type: 'section', text: { type: 'mrkdwn', text: '```' + $('Build Dashboard HTML').item.json.summary + '```' } },{ type: 'actions', elements: [ { type: 'button', text: { type: 'plain_text', text: '대시보드 보기', emoji: true }, url: 'https://sujinpark-datapopcorn.github.io/ccxn8n_demo/' } ] }]) }}",
+        "text": "=🚀 NASA 우주 날씨 주간 리포트 ({{ $('Build Dashboard HTML').item.json.today }})\n{{ $('Build Dashboard HTML').item.json.summary }}",
         "otherOptions": {
           "includeLinkToWorkflow": false
         }
